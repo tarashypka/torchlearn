@@ -9,7 +9,7 @@ $ cd torchlearn && pip install .
 
 ###### TextVectorizer
 ```
-from torchtext.vectorizer import TextVectorizer
+from torchlearn.vectorizer import TextVectorizer
 types = ['a', 'b', 'c']
 embeddings = np.random.random(size=(len(types), 5))
 texts = ['a b', 'c d']
