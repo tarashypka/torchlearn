@@ -35,3 +35,21 @@ def dump_pickle(filepath: os.PathLike, obj: Any):
 def load_pickle(filepath: os.PathLike) -> Any:
     with open(file=filepath, mode='rb') as f:
         return pickle.load(file=f)
+
+
+def read_lines(filepath: os.PathLike, **kwargs) -> Generator[str, None, None]:
+    filepath = plain_path(filepath)
+    kwargs.setdefault('mode', 'r')
+    kwargs.setdefault('encoding', 'utf-8')
+    with open(filepath, **kwargs) as f:
+        for line in f:
+            yield line.rstrip()
+
+
+def write_lines(filepath: os.PathLike, lines: List[str], **kwargs) -> None:
+    filepath = ensure_filedir(filepath)
+    kwargs.setdefault('mode', 'w')
+    kwargs.setdefault('encoding', 'utf-8')
+    with open(filepath, **kwargs) as f:
+        for line in lines:
+            f.write(line + '\n')
