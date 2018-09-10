@@ -4,6 +4,7 @@ from typing import *
 
 import numpy as np
 import torch
+from torch.autograd import Variable
 from torchtext.data import Field
 from torchtext.vocab import Vocab
 from torchlearn.utils import report, dump_pickle, load_pickle
@@ -23,10 +24,13 @@ class TextVectorizer:
 
         special_types = [TextVectorizer.__UNKNOWN__, TextVectorizer.__PADDING__]
         self.types_ = special_types + types
+        # Initialize embeddings for special types with random values
         special_embeddings = np.random.random(size=(len(special_types), embeddings.shape[1]))
-        self.embeddings_ = np.concatenate([special_embeddings, embeddings])
+        embeddings = np.concatenate([special_embeddings, embeddings])
+        embeddings = Variable(torch.Tensor(embeddings, device=device), requires_grad=False)
+        self.embeddings_ = embeddings
         self.text_field_ = Field(
-            fix_length=seq_len, dtype=torch.int32, pad_token=TextVectorizer.__PADDING__, pad_first=True)
+            fix_length=seq_len, pad_token=TextVectorizer.__PADDING__, pad_first=True)
         # Create vocab from fake counts, reverse types for torchtext to preserve their order
         freqs = Counter({t: i for i, t in enumerate(special_types + types[::-1])})
         self.text_field_.vocab = Vocab(counter=freqs, specials=special_types)
@@ -35,12 +39,12 @@ class TextVectorizer:
         tokens = text.split()
         return tokens
 
-    def transform_(self, texts: List[str]) -> np.array:
+    def transform_(self, texts: List[str]) -> torch.Tensor:
         texts = [self.tokenize_(text) for text in texts]
         texts = self.text_field_.process(batch=texts)
         return self.embeddings_[texts]
 
-    def transform(self, texts: List[str]) -> np.array:
+    def transform(self, texts: List[str]) -> torch.Tensor:
         """Transform batch of texts into (seq_len, batch_size, dim) tensor of embeddings"""
         return self.transform_(texts=texts)
 
