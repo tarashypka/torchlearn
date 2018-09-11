@@ -5,6 +5,7 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.autograd import Variable
 
+from .autoencoder import Autoencoder
 from torchlearn.utils import dump_pickle, load_pickle
 
 
@@ -15,6 +16,7 @@ def adjust_optimizer(optimizer: optim.Optimizer, learning_rate: float) -> optim.
 
 
 class Lstm(nn.Module):
+    """LSTM model"""
 
     def __init__(self, input_dim: int, hidden_dim: int, device: str='cpu'):
 
@@ -38,7 +40,7 @@ class Lstm(nn.Module):
         return y
 
 
-class LstmAutoencoder(nn.Module):
+class LstmAutoencoder(Autoencoder):
     """
     Lstm Autoencoder,
         takes text represented as sequence of word embeddings as input,
@@ -46,19 +48,10 @@ class LstmAutoencoder(nn.Module):
         decodes from latent space into output space of same dimensionality as input space.
     """
 
-    def __init__(self, input_dim: int, hidden_dim: int, device: str=None):
-        super(LstmAutoencoder, self).__init__()
-        if device is None:
-            device = 'cuda' if torch.cuda.is_available() else 'cpu'
-        self.device = device
-
-        self.encoder = Lstm(input_dim=input_dim, hidden_dim=hidden_dim, device=device)
-        self.decoder = Lstm(input_dim=hidden_dim, hidden_dim=input_dim, device=device)
-
-        if device == 'cuda':
-            self.embeddings = self.embeddings.cuda()
-            self.encoder = self.encoder.cuda()
-            self.decoder = self.decoder.cuda()
+    def __init__(self, input_dim: int, latent_dim: int, device: str='cpu'):
+        encoder = Lstm(input_dim=input_dim, hidden_dim=latent_dim, device=device)
+        decoder = Lstm(input_dim=latent_dim, hidden_dim=input_dim, device=device)
+        super(LstmAutoencoder, self).__init__(encoder=encoder, decoder=decoder, device=device)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """Forward pass, encode and decode"""
