@@ -2,7 +2,7 @@ import unittest
 
 import numpy as np
 import torch
-from torchlearn.vectorizer import TextVectorizer
+from torchlearn.vectorizer import TextTokenizer, EmbeddingTextVectorizer
 
 
 class TextVectorizerTest(unittest.TestCase):
@@ -11,7 +11,8 @@ class TextVectorizerTest(unittest.TestCase):
         """Test that transform() method returns proper vectors"""
         types = ['a', 'b', 'c', 'd']
         embeddings = np.random.random(size=(len(types), 200))
-        v = TextVectorizer(types=types, embeddings=embeddings, seq_len=8)
+        t = TextTokenizer()
+        v = EmbeddingTextVectorizer(types=types, embeddings=embeddings, tokenizer=t, seq_len=8)
         texts = ['a b d', 'unknown d']
         vectors = v.transform(texts=texts)
 
