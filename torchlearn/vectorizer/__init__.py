@@ -1,6 +1,7 @@
-from .text import TextVectorizer
+from .text import TextTokenizer, EmbeddingTextVectorizer
 
 
 __all__ = [
-    "TextVectorizer"
+    "TextTokenizer",
+    "EmbeddingTextVectorizer"
 ]
