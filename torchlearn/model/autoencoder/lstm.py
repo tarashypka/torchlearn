@@ -1,15 +1,8 @@
 import torch
 import torch.nn as nn
-import torch.optim as optim
 from torch.autograd import Variable
 
 from .autoencoder import Autoencoder
-
-
-def adjust_optimizer(optimizer: optim.Optimizer, learning_rate: float) -> optim.Optimizer:
-    for param_group in optimizer.param_groups:
-        param_group['lr'] = learning_rate
-    return optimizer
 
 
 class Lstm(nn.Module):

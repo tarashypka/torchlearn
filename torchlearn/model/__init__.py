@@ -1,5 +1,5 @@
 from .autoencoder import Autoencoder, DenseAutoencoder, LstmAutoencoder
-from .model import adjust_optimizer
+from .utils import adjust_optimizer
 
 
 __all__ = [
