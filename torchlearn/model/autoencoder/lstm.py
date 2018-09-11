@@ -1,12 +1,9 @@
-import os
-
 import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.autograd import Variable
 
 from .autoencoder import Autoencoder
-from torchlearn.utils import dump_pickle, load_pickle
 
 
 def adjust_optimizer(optimizer: optim.Optimizer, learning_rate: float) -> optim.Optimizer:
@@ -19,14 +16,11 @@ class Lstm(nn.Module):
     """LSTM model"""
 
     def __init__(self, input_dim: int, hidden_dim: int, device: str='cpu'):
-
         super(Lstm, self).__init__()
         self.input_dim = input_dim
         self.hidden_dim = hidden_dim
         self.device = device
-
         self.lstm = nn.LSTM(input_size=input_dim, hidden_size=hidden_dim)
-
         nn.init.xavier_uniform_(self.lstm.weight_ih_l0)
         nn.init.xavier_uniform_(self.lstm.weight_hh_l0)
 
@@ -56,11 +50,3 @@ class LstmAutoencoder(Autoencoder):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """Forward pass, encode and decode"""
         return self.decoder(self.encoder(x))
-
-    def save(self, filepath: os.PathLike):
-        """Save autoencoder into binary format"""
-        dump_pickle(filepath=filepath, obj=self)
-
-    def load(self, filepath: os.PathLike):
-        """Load autoencoder from binary format"""
-        return load_pickle(filepath=filepath)

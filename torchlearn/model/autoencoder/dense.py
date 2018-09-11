@@ -10,12 +10,10 @@ class Dense(nn.Module):
     """MLP model"""
 
     def __init__(self, input_dim: int, hidden_dims: List[int], output_dim: int, device: str='cpu'):
-
         super(Dense, self).__init__()
         self.input_dim = input_dim
         self.hidden_dims = hidden_dims
         self.device = device
-
         layers = nn.ModuleList()
         current_dim = input_dim
         for next_dim in hidden_dims:
