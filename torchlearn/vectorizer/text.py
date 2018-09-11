@@ -29,11 +29,10 @@ class TextTokenizer:
     def tokenize_word(word: str) -> str:
         return word.lower()
 
-    def tokenize(self, text: str) -> str:
+    def tokenize(self, text: str) -> List[str]:
         """Tokenize text into words"""
-        return ' '.join(
-            self.tokenize_word(word) for word in text.split()
-            if self.is_valid(word) and word not in self.stopterms)
+        return [self.tokenize_word(word) for word in text.split()
+                if self.is_valid(word) and word not in self.stopterms]
 
     def save(self, filepath: os.PathLike):
         """Save tokenizer into binary format"""
