@@ -1,4 +1,3 @@
-import os
 import regex as re
 from collections import Counter
 from typing import *
@@ -8,11 +7,11 @@ import torch
 from torch.autograd import Variable
 from torchtext.data import Field
 from torchtext.vocab import Vocab
-from torchlearn.utils import report, dump_pickle, load_pickle
+from torchlearn.utils import Savable, Loadable
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 
-class TextTokenizer:
+class TextTokenizer(Savable, Loadable):
 
     def __init__(
             self, token_pattern: str='^[^\W\d][^\W\d]+$', max_token_len: int=32,
@@ -34,19 +33,8 @@ class TextTokenizer:
         return [self.tokenize_word(word) for word in text.split()
                 if self.is_valid(word) and word not in self.stopterms]
 
-    def save(self, filepath: os.PathLike):
-        """Save tokenizer into binary format"""
-        report('Save vectorizer into', filepath, '...')
-        dump_pickle(filepath=filepath, obj=self)
 
-    @staticmethod
-    def load(filepath: os.PathLike):
-        """Load tokenizer from binary format"""
-        report('Load vectorizer from', filepath, '...')
-        return load_pickle(filepath=filepath)
-
-
-class TextVectorizer:
+class TextVectorizer(Savable, Loadable):
 
     def transform(self, texts: List[str]) -> torch.Tensor:
         pass
@@ -86,17 +74,6 @@ class EmbeddingTextVectorizer(TextVectorizer):
         texts = [self.tokenizer.tokenize(text) for text in texts]
         texts = self.text_field_.process(batch=texts)
         return self.embeddings_[texts]
-
-    def save(self, filepath: os.PathLike):
-        """Save vectorizer into binary format"""
-        report('Save vectorizer into', filepath, '...')
-        dump_pickle(filepath=filepath, obj=self)
-
-    @staticmethod
-    def load(filepath: os.PathLike):
-        """Load vectorizer from binary format"""
-        report('Load vectorizer from', filepath, '...')
-        return load_pickle(filepath=filepath)
 
 
 class TfidfTextVectorizer(TextVectorizer):
