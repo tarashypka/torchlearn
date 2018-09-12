@@ -1,8 +1,8 @@
 from .trainer import Trainer
-from .autoencoder import LstmAutoencoderTrainer
+from .mlp_trainer import MLPTrainer
 
 
 __all__ = [
     "Trainer",
-    "LstmAutoencoderTrainer"
+    "MLPTrainer"
 ]
