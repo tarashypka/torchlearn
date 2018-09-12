@@ -3,17 +3,16 @@ from typing import *
 import torch
 import torch.nn as nn
 
-from .autoencoder import Autoencoder
+from torchlearn.model import Model
 
 
 class Dense(nn.Module):
     """MLP model"""
 
-    def __init__(self, input_dim: int, hidden_dims: List[int], output_dim: int, device: str='cpu'):
+    def __init__(self, input_dim: int, hidden_dims: List[int], output_dim: int):
         super(Dense, self).__init__()
         self.input_dim = input_dim
         self.hidden_dims = hidden_dims
-        self.device = device
         layers = nn.ModuleList()
         current_dim = input_dim
         for next_dim in hidden_dims:
@@ -26,7 +25,7 @@ class Dense(nn.Module):
         return self.layers(x)
 
 
-class DenseAutoencoder(Autoencoder):
+class DenseAutoencoder(Model):
     """
     Dense Autoencoder,
         takes vectorized text as input,
@@ -34,10 +33,13 @@ class DenseAutoencoder(Autoencoder):
         decodes from latent space into output space of same dimensionality as input space.
     """
 
-    def __init__(self, input_dim: int, hidden_dims: List[int], latent_dim: int, device: str='cpu'):
-        encoder = Dense(input_dim=input_dim, hidden_dims=hidden_dims, output_dim=latent_dim)
-        decoder = Dense(input_dim=latent_dim, hidden_dims=hidden_dims[::-1], output_dim=input_dim)
-        super(DenseAutoencoder, self).__init__(encoder=encoder, decoder=decoder, device=device)
+    def __init__(self, input_dim: int, hidden_dims: List[int], latent_dim: int, **kwargs):
+        super(DenseAutoencoder, self).__init__(**kwargs)
+        self.encoder = Dense(input_dim=input_dim, hidden_dims=hidden_dims, output_dim=latent_dim)
+        self.decoder = Dense(input_dim=latent_dim, hidden_dims=hidden_dims[::-1], output_dim=input_dim)
+        if self.device == 'cuda':
+            self.encoder = self.encoder.cuda()
+            self.decoder = self.decoder.cuda()
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """Forward pass, encode and decode"""
