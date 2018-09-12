@@ -1,4 +1,5 @@
 import os
+import shutil
 from datetime import datetime as dt
 from pathlib import Path
 from typing import *
@@ -7,7 +8,7 @@ import dill as pickle
 
 
 def report(*args, **kwargs):
-    print(f'[{dt.now().strftime("%Y-%m-%s %H:%M:%S")}]', *args, **kwargs)
+    print(f'[{dt.now().strftime("%Y-%m-%d %H:%M:%S")}]', *args, **kwargs)
 
 
 def plain_path(path: os.PathLike) -> Path:
@@ -32,9 +33,24 @@ def dump_pickle(filepath: os.PathLike, obj: Any):
         pickle.dump(obj=obj, file=f)
 
 
+class Savable:
+    """Interface for objects that may be saved"""
+
+    def __save__(self, filepath: os.PathLike):
+        dump_pickle(filepath=filepath, obj=self)
+
+
 def load_pickle(filepath: os.PathLike) -> Any:
     with open(file=filepath, mode='rb') as f:
         return pickle.load(file=f)
+
+
+class Loadable:
+    """Interface for objects that may be loaded"""
+
+    @classmethod
+    def __load__(cls, filepath: os.PathLike):
+        return load_pickle(filepath=filepath)
 
 
 def read_lines(filepath: os.PathLike, **kwargs) -> Generator[str, None, None]:
@@ -53,3 +69,9 @@ def write_lines(filepath: os.PathLike, lines: List[str], **kwargs) -> None:
     with open(filepath, **kwargs) as f:
         for line in lines:
             f.write(line + '\n')
+
+
+def clear_dir(dir: os.PathLike):
+    dir = plain_path(dir)
+    shutil.rmtree(dir)
+    dir.mkdir()
