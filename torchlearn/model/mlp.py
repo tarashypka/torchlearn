@@ -11,6 +11,9 @@ class MLP(nn.Module):
     """Multi-layer perceptron model"""
 
     def __init__(self, input_dim: int, hidden_dims: List[int]=None, output_dim: int=2):
+        self.input_dim = input_dim
+        self.hidden_dims = hidden_dims
+        self.output_dim = output_dim
 
 
 class LogisticRegression(nn.Module):
