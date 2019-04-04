@@ -20,7 +20,7 @@ class MLP(nn.Module):
         self.layers_ = nn.ModuleList()
         dims = [input_dim] + hidden_dims + [output_dim]
         for input_dim, output_dim in zip(dims[:-1], dims[1:]):
-            layer = nn.Linear(in_features=1 + input_dim, out_features=output_dim)
+            layer = nn.Linear(in_features=input_dim, out_features=output_dim)
             nn.init.xavier_uniform_(layer.weight)
             self.layers_.append(layer)
         self.activation_ = nn.ReLU()
@@ -32,8 +32,6 @@ class MLP(nn.Module):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """Estimate probability of x"""
         for layer in self.layers_:
-            bias = torch.ones(size=(x.shape[0], 1))
-            x = torch.cat((x, bias), dim=1)
             x = self.activation_(layer(x))
         return self.sigmoid_(x)
 
