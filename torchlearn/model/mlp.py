@@ -19,7 +19,8 @@ class MLP(nn.Module):
         self.output_dim = output_dim
 
         self.layers = nn.ModuleList()
-        for input_dim, output_dim in [input_dim] + hidden_dims + [output_dim]:
+        dims = [input_dim] + hidden_dims + [output_dim]
+        for input_dim, output_dim in zip(dims[:-1], dims[1:]):
             self.layers.append(nn.Linear(in_features=1 + input_dim, out_features=output_dim))
         self.sigmoid = nn.Sigmoid()
 
