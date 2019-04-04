@@ -2,9 +2,7 @@ import os
 from typing import *
 
 import torch
-import numpy as np
 from torch import nn
-from torch.autograd import Variable
 
 from torchlearn.utils import default_device
 
@@ -22,7 +20,9 @@ class MLP(nn.Module):
         self.layers_ = nn.ModuleList()
         dims = [input_dim] + hidden_dims + [output_dim]
         for input_dim, output_dim in zip(dims[:-1], dims[1:]):
-            self.layers_.append(nn.Linear(in_features=1 + input_dim, out_features=output_dim))
+            layer = nn.Linear(in_features=1 + input_dim, out_features=output_dim)
+            nn.init.xavier_uniform_(layer.weight)
+            self.layers_.append(layer)
         self.activation_ = nn.ReLU()
         self.sigmoid_ = nn.Sigmoid()
 
