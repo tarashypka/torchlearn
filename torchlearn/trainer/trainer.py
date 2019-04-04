@@ -1,5 +1,4 @@
 from torchlearn.callback import Callback
-
 from torchlearn.utils import Savable, Loadable
 
 
