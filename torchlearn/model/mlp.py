@@ -23,19 +23,19 @@ class MLP(nn.Module):
         dims = [input_dim] + hidden_dims + [output_dim]
         for input_dim, output_dim in zip(dims[:-1], dims[1:]):
             self.layers_.append(nn.Linear(in_features=1 + input_dim, out_features=output_dim))
+        self.activation_ = nn.ReLU()
         self.sigmoid_ = nn.Sigmoid()
 
         if self.device == 'cuda':
             self.layers_ = self.layers_.cuda()
 
-    def forward(self, x: torch.Tensor) -> np.array:
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         """Estimate probability of x"""
-        y: Variable = x
         for layer in self.layers_:
-            bias = torch.ones(size=(y.shape[0], 1))
-            y = torch.cat((y, bias), dim=1)
-            y = self.sigmoid_(layer(y))
-        return y.data.numpy()
+            bias = torch.ones(size=(x.shape[0], 1))
+            x = torch.cat((x, bias), dim=1)
+            x = self.activation_(layer(x))
+        return self.sigmoid_(x)
 
 
 class LogisticRegression(nn.Module):
@@ -53,9 +53,9 @@ class LogisticRegression(nn.Module):
         if self.device == 'cuda':
             self.weights_ = self.weights_.cuda()
 
-    def forward(self, x: torch.Tensor) -> np.array:
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         """Estimate probability of x"""
-        return self.sigmoid_(self.weights_(x)).data.numpy()
+        return self.sigmoid_(self.weights_(x))
 
     def save(self, filepath: os.PathLike):
         """Save model into binary format"""
