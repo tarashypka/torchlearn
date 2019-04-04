@@ -2,7 +2,6 @@ import torch
 import torch.nn as nn
 from torch.autograd import Variable
 
-from torchlearn.model import Model
 from torchlearn.utils import default_device
 
 
@@ -28,7 +27,7 @@ class Lstm(nn.Module):
         return y
 
 
-class LstmAutoencoder(Model):
+class LstmAutoencoder(nn.Module):
     """
     Lstm Autoencoder,
         takes text represented as sequence of word embeddings as input,
@@ -36,8 +35,8 @@ class LstmAutoencoder(Model):
         decodes from latent space into output space of same dimensionality as input space.
     """
 
-    def __init__(self, input_dim: int, latent_dim: int, **kwargs):
-        super(LstmAutoencoder, self).__init__(**kwargs)
+    def __init__(self, input_dim: int, latent_dim: int):
+        super(LstmAutoencoder, self).__init__()
         self.encoder = Lstm(input_dim=input_dim, hidden_dim=latent_dim, device=self.device)
         self.decoder = Lstm(input_dim=latent_dim, hidden_dim=input_dim, device=self.device)
         if self.device == 'cuda':

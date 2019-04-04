@@ -3,8 +3,6 @@ from typing import *
 import torch
 import torch.nn as nn
 
-from torchlearn.model import Model
-
 
 class Dense(nn.Module):
     """MLP model"""
@@ -25,7 +23,7 @@ class Dense(nn.Module):
         return self.layers(x)
 
 
-class DenseAutoencoder(Model):
+class DenseAutoencoder(nn.Module):
     """
     Dense Autoencoder,
         takes vectorized text as input,
@@ -33,8 +31,8 @@ class DenseAutoencoder(Model):
         decodes from latent space into output space of same dimensionality as input space.
     """
 
-    def __init__(self, input_dim: int, hidden_dims: List[int], latent_dim: int, **kwargs):
-        super(DenseAutoencoder, self).__init__(**kwargs)
+    def __init__(self, input_dim: int, hidden_dims: List[int], latent_dim: int):
+        super(DenseAutoencoder, self).__init__()
         self.encoder = Dense(input_dim=input_dim, hidden_dims=hidden_dims, output_dim=latent_dim)
         self.decoder = Dense(input_dim=latent_dim, hidden_dims=hidden_dims[::-1], output_dim=input_dim)
         if self.device == 'cuda':
