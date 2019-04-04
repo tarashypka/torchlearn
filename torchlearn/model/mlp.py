@@ -31,9 +31,11 @@ class MLP(nn.Module):
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """Estimate probability of x"""
-        for layer in self.layers_:
+        hidden_layers = self.layers_[:-1]
+        output_layer = self.layers_[-1]
+        for layer in hidden_layers:
             x = self.activation_(layer(x))
-        return self.sigmoid_(x)
+        return self.sigmoid_(output_layer(x))
 
 
 class LogisticRegression(nn.Module):
