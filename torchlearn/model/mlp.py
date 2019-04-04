@@ -12,47 +12,50 @@ from torchlearn.utils import default_device
 class MLP(nn.Module):
     """Multi-layer perceptron model"""
 
-    def __init__(self, input_dim: int, hidden_dims: List[int]=None, output_dim: int=1):
+    def __init__(self, input_dim: int, hidden_dims: List[int]=None, output_dim: int=1, device: str=default_device()):
         super(MLP, self).__init__()
         self.input_dim = input_dim
         self.hidden_dims = hidden_dims
         self.output_dim = output_dim
+        self.device = device
 
-        self.layers = nn.ModuleList()
+        self.layers_ = nn.ModuleList()
         dims = [input_dim] + hidden_dims + [output_dim]
         for input_dim, output_dim in zip(dims[:-1], dims[1:]):
-            self.layers.append(nn.Linear(in_features=1 + input_dim, out_features=output_dim))
-        self.sigmoid = nn.Sigmoid()
+            self.layers_.append(nn.Linear(in_features=1 + input_dim, out_features=output_dim))
+        self.sigmoid_ = nn.Sigmoid()
 
         if self.device == 'cuda':
-            self.input_layer = self.input_layer.cuda()
-            self.hidden_layers = self.hidden_layers.cuda()
+            self.layers_ = self.layers_.cuda()
 
     def forward(self, x: torch.Tensor) -> np.array:
         """Estimate probability of x"""
-        y: Variable = None
-        for layer in self.layers:
-            y = self.sigmoid(layer(x))
+        y: Variable = x
+        for layer in self.layers_:
+            bias = torch.ones(size=(y.shape[0], 1))
+            y = torch.cat((y, bias), dim=1)
+            y = self.sigmoid_(layer(y))
         return y.data.numpy()
 
 
 class LogisticRegression(nn.Module):
     """Logistic Regression model"""
 
-    def __init__(self, input_dim: int, device: str=None):
+    def __init__(self, input_dim: int, device: str=default_device()):
         super(LogisticRegression, self).__init__()
         self.input_dim = input_dim
-        self.device = default_device() if device is None else device
+        self.device = device
+
         # Add bias weight
-        self.weights = nn.Linear(in_features=1 + input_dim, out_features=1)
-        self.sigmoid = nn.Sigmoid()
+        self.weights_ = nn.Linear(in_features=1 + input_dim, out_features=1)
+        self.sigmoid_ = nn.Sigmoid()
 
         if self.device == 'cuda':
-            self.weights = self.weights.cuda()
+            self.weights_ = self.weights_.cuda()
 
     def forward(self, x: torch.Tensor) -> np.array:
         """Estimate probability of x"""
-        return self.sigmoid(self.weights(x)).data.numpy()
+        return self.sigmoid_(self.weights_(x)).data.numpy()
 
     def save(self, filepath: os.PathLike):
         """Save model into binary format"""
