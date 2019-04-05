@@ -10,7 +10,7 @@ from torchlearn.utils import default_device
 class MLP(nn.Module):
     """Multi-layer perceptron model"""
 
-    def __init__(self, input_dim: int, hidden_dims: List[int]=None, output_dim: int=1, device: str=default_device()):
+    def __init__(self, input_dim: int, hidden_dims: List[int]=None, output_dim: int=2, device: str=default_device()):
         super(MLP, self).__init__()
         self.input_dim = input_dim
         self.hidden_dims = hidden_dims
@@ -24,7 +24,7 @@ class MLP(nn.Module):
             nn.init.xavier_uniform_(layer.weight)
             self.layers_.append(layer)
         self.activation_ = nn.ReLU()
-        self.sigmoid_ = nn.Sigmoid()
+        self.prediction_ = nn.Sigmoid()
 
         if self.device == 'cuda':
             self.layers_ = self.layers_.cuda()
@@ -35,7 +35,7 @@ class MLP(nn.Module):
         output_layer = self.layers_[-1]
         for layer in hidden_layers:
             x = self.activation_(layer(x))
-        return self.sigmoid_(output_layer(x))
+        return self.prediction_(output_layer(x))
 
 
 class LogisticRegression(nn.Module):
