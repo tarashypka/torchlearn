@@ -40,7 +40,9 @@ class MLP(nn.Module):
         self.prediction_ = nn.Softmax() if output_dim > 1 else nn.Sigmoid()
 
         if self.device == 'cuda':
-            self.layers_ = self.layers_.cuda()
+            self.inp_layer = self.inp_layer.cuda()
+            self.hidden_layers_ = self.hidden_layers_.cuda()
+            self.outp_layer = self.outp_layer.cuda()
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """Estimate probability of x"""
