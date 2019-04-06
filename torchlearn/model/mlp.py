@@ -10,19 +10,34 @@ from torchlearn.utils import default_device
 class MLP(nn.Module):
     """Multi-layer perceptron model"""
 
-    def __init__(self, input_dim: int, hidden_dims: List[int]=None, output_dim: int=2, device: str=default_device()):
+    def __init__(self, input_dim: int, hidden_dims: List[int]=None, output_dim: int=1, device: str=default_device()):
         super(MLP, self).__init__()
-        self.input_dim = input_dim
+        self.inp_dim = input_dim
         self.hidden_dims = hidden_dims
-        self.output_dim = output_dim
+        self.outp_dim = output_dim
         self.device = device
 
-        self.layers_ = nn.ModuleList()
-        dims = [input_dim] + hidden_dims + [output_dim]
-        for input_dim, output_dim in zip(dims[:-1], dims[1:]):
-            layer = nn.Linear(in_features=input_dim, out_features=output_dim)
+        if not hidden_dims:
+            raise AttributeError(f'Invalid value of hidden_dims = {hidden_dims}, must contain at least one dimension!')
+
+        self.inp_layer = nn.Linear(in_features=input_dim, out_features=hidden_dims[0])
+
+        self.hidden_layers_ = nn.ModuleList()
+        for inp_dim, outp_dim in zip(self.hidden_dims[:-1], self.hidden_dims[1:]):
+            layer = nn.Linear(in_features=inp_dim, out_features=outp_dim)
             nn.init.xavier_uniform_(layer.weight)
-            self.layers_.append(layer)
+            self.hidden_layers_.append(layer)
+
+        self.outp_layer = nn.Linear(in_features=hidden_dims[-1], out_features=output_dim)
+
+        self.dropout_ = nn.ModuleList()
+        self.batch_norm_ = nn.ModuleList()
+        self.batch_norm_.append(nn.BatchNorm1d(num_features=self.inp_dim))
+        self.batch_norm_.append(nn.BatchNorm1d(num_features=self.inp_layer.out_features))
+        for layer in self.hidden_layers_:
+            self.dropout_.append(nn.Dropout(p=0.2))
+            self.batch_norm_.append(nn.BatchNorm1d(num_features=layer.out_features))
+
         self.activation_ = nn.ReLU()
         self.prediction_ = nn.Softmax() if output_dim > 1 else nn.Sigmoid()
 
@@ -31,11 +46,13 @@ class MLP(nn.Module):
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """Estimate probability of x"""
-        hidden_layers = self.layers_[:-1]
-        output_layer = self.layers_[-1]
-        for layer in hidden_layers:
-            x = self.activation_(layer(x))
-        return self.prediction_(output_layer(x))
+        x = self.batch_norm_[0](x)
+        x = self.inp_layer(x)
+        x = self.batch_norm_[1](x)
+        for hidden, dropout, batch_norm in zip(self.hidden_layers_, self.dropout_, self.batch_norm_[2:]):
+            x = batch_norm(dropout(self.activation_((hidden(x)))))
+        y = self.prediction_(self.outp_layer(x))
+        return y
 
 
 class LogisticRegression(nn.Module):
