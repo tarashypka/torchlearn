@@ -24,7 +24,7 @@ class MLP(nn.Module):
             nn.init.xavier_uniform_(layer.weight)
             self.layers_.append(layer)
         self.activation_ = nn.ReLU()
-        self.prediction_ = nn.Sigmoid()
+        self.prediction_ = nn.Softmax() if output_dim > 1 else nn.Sigmoid()
 
         if self.device == 'cuda':
             self.layers_ = self.layers_.cuda()
