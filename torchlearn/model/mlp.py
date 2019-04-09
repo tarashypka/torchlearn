@@ -47,8 +47,11 @@ class MLP(nn.Module):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """Estimate probability of x"""
         x = self.inp_layer(x)
-        x = self.batch_norm_[0](x)
+        if x.shape[0] > 1:
+            x = self.batch_norm_[0](x)
         for hidden, dropout, batch_norm in zip(self.hidden_layers_, self.dropout_, self.batch_norm_[1:]):
-            x = batch_norm(dropout(self.activation_((hidden(x)))))
+            x = dropout(self.activation_((hidden(x))))
+            if x.shape[0] > 1:
+                x = batch_norm(x)
         y = self.prediction_(self.outp_layer(x))
         return y
