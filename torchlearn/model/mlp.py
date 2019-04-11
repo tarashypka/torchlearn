@@ -43,6 +43,7 @@ class MLP(nn.Module):
             self.inp_layer = self.inp_layer.cuda()
             self.hidden_layers_ = self.hidden_layers_.cuda()
             self.outp_layer = self.outp_layer.cuda()
+            self.batch_norm_ = self.batch_norm_.cuda()
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """Estimate probability of x"""
