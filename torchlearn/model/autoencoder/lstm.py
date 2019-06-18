@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 
-from torchlearn.model import Lstm
+from ..lstm import Lstm
 
 
 class LstmAutoencoder(nn.Module):
