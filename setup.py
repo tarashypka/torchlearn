@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 
 setup(
@@ -7,7 +7,6 @@ setup(
     description='Pointless sketches with pytorch',
     author='Taras Shypka',
     author_email='tarashypka@gmail.com',
-    packages=['torchlearn', 'torchlearn.utils', 'torchlearn.vectorizer'],
+    packages=find_packages(exclude=['tests', 'tests.*']),
     python_requires='>=3.6',
-    test_suite='tests'
-)
+    test_suite='tests')
