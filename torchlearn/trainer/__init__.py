@@ -1,3 +1,3 @@
 from .trainer import Trainer
-from .mlp_trainer import MLPTrainer
+from .mlp import MLPTrainer
 from .utils import adjust_optimizer

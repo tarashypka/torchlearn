@@ -1,1 +1,1 @@
-from .lstm_trainer import LstmAutoencoderTrainer
+from .lstm import LstmAutoencoderTrainer
