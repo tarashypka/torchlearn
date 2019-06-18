@@ -25,3 +25,16 @@ class Lstm(nn.Module):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         y, _ = self.lstm(x, self.get_hidden(batch_size=x.shape[1]))
         return y
+
+
+class LstmClassifier(Lstm):
+    """Lstm model with linear layer on top"""
+
+    def __init__(self, input_dim: int, hidden_dim: int, output_dim: int, device: str=default_device()):
+        super().__init__(input_dim=input_dim, hidden_dim=hidden_dim, device=device)
+        self.output_dim = output_dim
+        self.hidden2label = nn.Linear(hidden_dim, output_dim)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        y = super().forward(x=x)
+        return self.hidden2label(y[-1])
