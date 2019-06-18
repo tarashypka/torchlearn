@@ -1,22 +1,28 @@
 #!/bin/bash
 
-PROJ_DIR=$(dirname $0)
-cd $PROJ_DIR
-
-ANACONDA=/usr/local/anaconda
-export PATH=$ANACONDA/bin:$PATH
 ENV_NAME=$1
-if [[ $ENV_NAME == "" ]]; then
-    ENV_PATH=$ANACONDA
+MODULE_DIR=$(dirname $0)
+PYTHON_VERSION=3.7
+ANACONDA_PATH=${HOME}/miniconda3
+
+export PATH=${ANACONDA_PATH}/bin:$PATH
+
+if [[ ${ENV_NAME} == "" ]]; then
+    ENV_PATH=${ANACONDA_PATH}
 else
-    ENV_PATH=$ANACONDA/envs/$ENV_NAME
-    if [[ ! -d $ENV_PATH ]]; then
-        conda create --prefix=$ENV_PATH --file=conda_libs.txt
+    ENV_PATH=${ANACONDA_PATH}/envs/${ENV_NAME}
+    if [[ ! -d ${ENV_PATH} ]]; then
+        conda create -n ${ENV_NAME} python=${PYTHON_VERSION}
     fi
-    source activate $ENV_NAME
+    source ${ANACONDA_PATH}/etc/profile.d/conda.sh
+    conda activate ${ENV_NAME}
 fi
 
-pip install https://download.pytorch.org/whl/cpu/torch-1.0.1.post2-cp36-cp36m-linux_x86_64.whl
-pip install torchvision
-pip install -r requirements.txt
-pip install .
+PIP=${ENV_PATH}/bin/pip
+# CPU
+${PIP} install https://download.pytorch.org/whl/cpu/torch-1.1.0-cp37-cp37m-linux_x86_64.whl
+${PIP} install https://download.pytorch.org/whl/cpu/torchvision-0.3.0-cp37-cp37m-linux_x86_64.whl
+# GPU
+#${PIP} install torch torchvision
+${PIP} install -r requirements.txt
+${PIP} install .
