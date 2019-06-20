@@ -6,10 +6,11 @@ from torch import nn
 from torch import optim
 from tqdm import tqdm
 
-from torchlearn.utils import read_lines, report, batches, plain_path, avg_loss
+from pysimple.io import read_lines, plain_path
 from torchlearn.vectorizer import EmbeddingTextVectorizer
 from torchlearn.model.autoencoder import LstmAutoencoder
 from torchlearn.trainer import Trainer
+from torchlearn.utils import batches, avg_loss
 
 
 class LstmAutoencoderTrainer(Trainer):
@@ -47,7 +48,7 @@ class LstmAutoencoderTrainer(Trainer):
 
     def report(self, *args, **kwargs):
         if self.verbosity > 0:
-            report(*args, **kwargs)
+            print(*args, **kwargs)
 
     def train(self, n_epochs: int, progress_bar=tqdm, save_per_min: int=None):
         n_batches = len(self.texts_paths) * self.texts_in_file // self.batch_size

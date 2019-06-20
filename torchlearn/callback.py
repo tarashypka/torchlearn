@@ -6,7 +6,8 @@ from typing import *
 import torch
 from torch import nn
 
-from torchlearn.utils import report, dump_pickle, Savable
+from pysimple.io import dump_pickle
+from torchlearn.io import Savable
 
 
 class Callback:
@@ -28,7 +29,7 @@ class SaveCallback(Callback):
         now = time()
         if self.prev_save_ is None or now - self.prev_save_ > self.save_per_min * 60:
             save_path = self.cache_dir_ / f'{self.save_name}_{dt.now().strftime("%Y%m%d%H%M%S")}.bin'
-            report('Save', self.save_name, 'into', save_path, '...')
+            print('Save', self.save_name, 'into', save_path, '...')
             if isinstance(self.obj_to_save, Savable):
                 self.obj_to_save.__save__(filepath=save_path)
             elif isinstance(self.obj_to_save, nn.Module):

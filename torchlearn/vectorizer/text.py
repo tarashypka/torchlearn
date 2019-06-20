@@ -7,8 +7,9 @@ import torch
 from torch.autograd import Variable
 from torchtext.data import Field
 from torchtext.vocab import Vocab
-from torchlearn.utils import Savable, Loadable
 from sklearn.feature_extraction.text import TfidfVectorizer
+
+from torchlearn.io import Savable, Loadable
 
 
 class TextTokenizer(Savable, Loadable):

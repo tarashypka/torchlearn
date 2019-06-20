@@ -1,5 +1,5 @@
 from torchlearn.callback import Callback
-from torchlearn.utils import Savable, Loadable
+from torchlearn.io import Savable, Loadable
 
 
 class Trainer(Savable, Loadable):

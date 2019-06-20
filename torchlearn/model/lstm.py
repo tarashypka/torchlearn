@@ -27,7 +27,7 @@ class Lstm(nn.Module):
         return y
 
 
-class LstmClassifier(Lstm):
+class LstmRegressor(Lstm):
     """Lstm model with linear layer on top"""
 
     def __init__(self, input_dim: int, hidden_dim: int, output_dim: int, device: str=default_device()):
