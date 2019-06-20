@@ -1,8 +1,9 @@
 #!/bin/bash
 
 ENV_NAME=$1
-MODULE_DIR=$(dirname $0)
+MODULE_DIR=$(realpath $(dirname $0))
 PYTHON_VERSION=3.7
+DEVICE=CPU
 ANACONDA_PATH=${HOME}/miniconda3
 
 export PATH=${ANACONDA_PATH}/bin:$PATH
@@ -19,10 +20,36 @@ else
 fi
 
 PIP=${ENV_PATH}/bin/pip
-# CPU
-${PIP} install https://download.pytorch.org/whl/cpu/torch-1.1.0-cp37-cp37m-linux_x86_64.whl
-${PIP} install https://download.pytorch.org/whl/cpu/torchvision-0.3.0-cp37-cp37m-linux_x86_64.whl
-# GPU
-#${PIP} install torch torchvision
+
+echo "Install pysimple dependency ..."
+cd ${MODULE_DIR}
+rm -rf .cache/pysimple
+git clone https://github.com/tarashypka/pysimple.git .cache/pysimple
+cd .cache/pysimple
+./install.sh ${ENV_NAME}
+cd ${MODULE_DIR}
+rm -rf .cache/pysimple
+
+echo "Install pytorch dependency on device ${DEVICE} ..."
+if [[ ${DEVICE} == "CPU" ]]; then
+    ${PIP} install https://download.pytorch.org/whl/cpu/torch-1.1.0-cp37-cp37m-linux_x86_64.whl
+    ${PIP} install https://download.pytorch.org/whl/cpu/torchvision-0.3.0-cp37-cp37m-linux_x86_64.whl
+elif [[ ${DEVICE} == "GPU" ]]; then
+    ${PIP} install torch torchvision
+fi
+
 ${PIP} install -r requirements.txt
 ${PIP} install .
+
+function run_tests
+{
+    echo "${ENV_PATH}/bin/python -m unittest discover -s ${MODULE_DIR}/tests -t ${MODULE_DIR} -v"
+}
+
+if [[ -d ${MODULE_DIR}/tests ]]; then
+    TESTS_PASSED=$($(run_tests) 2>&1 | tee /dev/tty | tail -1)
+fi
+
+if [[ ${TESTS_PASSED} != "OK" ]]; then
+    exit
+fi
