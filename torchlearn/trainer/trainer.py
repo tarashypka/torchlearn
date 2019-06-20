@@ -12,3 +12,7 @@ class Trainer(Savable, Loadable):
 
     def add_callback(self, callback: Callback):
         self.callbacks.append(callback)
+
+    def call_callbacks(self):
+        for callback in self.callbacks:
+            callback()

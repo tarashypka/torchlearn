@@ -29,6 +29,5 @@ class LstmTrainer(Trainer):
         loss = self.loss(y_pred, y)
         loss.backward()
         self.optimizer.step()
-        for callback in self.callbacks:
-            callback()
+        self.call_callbacks()
         return y_pred, loss.item()

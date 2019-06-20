@@ -6,7 +6,7 @@ from typing import *
 import torch
 from torch import nn
 
-from pysimple.io import dump_pickle
+from pysimple.io import dump_pickle, ensure_dir
 from torchlearn.io import Savable
 
 
@@ -22,8 +22,7 @@ class SaveCallback(Callback):
         self.save_name = save_name
 
         self.prev_save_: int = None
-        self.cache_dir_ = Path('.torchtext')
-        self.cache_dir_.mkdir(exist_ok=True, parents=True)
+        self.cache_dir_ = ensure_dir(dirpath=Path('.torchtext'))
 
     def __call__(self, *args, **kwargs):
         now = time()
@@ -31,7 +30,7 @@ class SaveCallback(Callback):
             save_path = self.cache_dir_ / f'{self.save_name}_{dt.now().strftime("%Y%m%d%H%M%S")}.bin'
             print('Save', self.save_name, 'into', save_path, '...')
             if isinstance(self.obj_to_save, Savable):
-                self.obj_to_save.__save__(filepath=save_path)
+                self.obj_to_save.save(filepath=save_path)
             elif isinstance(self.obj_to_save, nn.Module):
                 torch.save(obj=self.obj_to_save, f=save_path)
             else:
