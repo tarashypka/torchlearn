@@ -1,13 +1,12 @@
 import os
 import random
-from pathlib import Path
 from typing import *
 
 from torch import nn
 from torch import optim
 from tqdm import tqdm
 
-from pysimple.io import read_lines, plain_path, ensure_dir
+from pysimple.io import read_lines, plain_path
 from torchlearn.vectorizer import EmbeddingTextVectorizer
 from torchlearn.model.autoencoder import LstmAutoencoder
 from torchlearn.trainer import Trainer
@@ -44,7 +43,6 @@ class LstmAutoencoderTrainer(Trainer):
 
         self.epoch_: int = 0
         self.iter_: int = 0
-        self.cache_dir_ = ensure_dir(dirpath=Path('.torchtext'))
 
     def report(self, *args, **kwargs):
         if self.verbosity > 0:

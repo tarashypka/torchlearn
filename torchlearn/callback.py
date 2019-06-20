@@ -16,23 +16,23 @@ class Callback:
 
 class SaveCallback(Callback):
 
-    def __init__(self, obj_to_save: Any, save_per_min: int, save_name: str):
-        self.obj_to_save = obj_to_save
+    def __init__(self, obj: Any, name: str, save_per_min: int, save_dir: Path):
+        self.obj = obj
+        self.name = name
         self.save_per_min = save_per_min
-        self.save_name = save_name
+        self.save_dir = ensure_dir(dirpath=save_dir)
 
         self.prev_save_: int = None
-        self.cache_dir_ = ensure_dir(dirpath=Path('.torchtext'))
 
     def __call__(self, *args, **kwargs):
         now = time()
         if self.prev_save_ is None or now - self.prev_save_ > self.save_per_min * 60:
-            save_path = self.cache_dir_ / f'{self.save_name}_{dt.now().strftime("%Y%m%d%H%M%S")}.bin'
-            print('Save', self.save_name, 'into', save_path, '...')
-            if isinstance(self.obj_to_save, Savable):
-                self.obj_to_save.save(filepath=save_path)
-            elif isinstance(self.obj_to_save, nn.Module):
-                torch.save(obj=self.obj_to_save, f=save_path)
+            save_path = self.save_dir / f'{self.name}_{dt.now().strftime("%y%m%d%H%M%S")}.bin'
+            print('Save', self.name, 'into', save_path, '...')
+            if isinstance(self.obj, Savable):
+                self.obj.save(filepath=save_path)
+            elif isinstance(self.obj, nn.Module):
+                torch.save(obj=self.obj, f=save_path)
             else:
-                dump_pickle(filepath=save_path, obj=self.obj_to_save)
+                dump_pickle(filepath=save_path, obj=self.obj)
             self.prev_save_ = now
